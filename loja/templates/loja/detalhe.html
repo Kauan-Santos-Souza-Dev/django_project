@@ -1,0 +1,7 @@
+{% extends 'loja/base.html' %}
+
+{% block conteudo %}
+    <h1>{{ produto.nome|upper }}</h1>
+    <p>Preço: R$ {{ produto.preco|floatformat:2 }}</p>
+    <a href="{% url 'lista_produtos' %}">Voltar para a lista</a>
+{% endblock %}

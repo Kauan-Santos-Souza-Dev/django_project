@@ -1,0 +1,11 @@
+
+<!-- Herança de templates - Template pai -->
+
+<nav>
+    <a href="{% url 'lista_produtos' %}">,Minha Loja</a> |
+    <a href="{% url 'contato' %}">Contato</a>
+</nav>
+<hr>
+
+{% block conteudo %}  <!-- Criamos um buraco para o conteúdo específico de cada página -->
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'loja/base.html' %}
+
+{% block conteudo %}
+    <h1>Produtos</h1>
+
+    {% if busca %}
+        <p>Você buscou por: {{ busca }}</p>
+    {% endif %}
+
+    {% if produtos %}
+        <ul>
+        {% for produto in produtos %}
+            <li>
+                <a href="{% url 'detalhe_produto' produto.id %}">{{ produto.nome|upper }}</a>
+                - R$ {{ produto.preco|floatformat:2 }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nenhum produto encontrado.</p>
+    {% endif %}
+
+{% endblock %}
