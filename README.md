@@ -22,6 +22,8 @@ A cada etapa do aprendizado, um recurso novo entra na loja:
 | Models e ORM | Tabela de produtos no MySQL |
 | Migrations | Histórico de mudanças do banco |
 | Variáveis de ambiente | Senha do banco fora do código (`.env`) |
+| Django Admin | Painel para cadastrar e editar produtos |
+| Forms e ModelForm | Formulário de contato e cadastro de produto, com validação |
 
 ---
 
@@ -30,8 +32,13 @@ A cada etapa do aprendizado, um recurso novo entra na loja:
 - 📋 **Listagem de produtos**, lida direto do banco de dados
 - 🔍 **Busca por nome** (sem diferenciar maiúsculas de minúsculas)
 - 📄 **Página de detalhe** de cada produto, com erro 404 quando ele não existe
+- 🛠️ **Painel administrativo** (Django Admin) para gerenciar os produtos
+- ✉️ **Formulário de contato** com validação dos campos e mensagens de erro
+- ➕ **Cadastro de produto pelo site**, feito com `ModelForm` e redirecionamento após salvar
 - 🗄️ **Banco MySQL** conectado ao Django pelo ORM
 - 🔐 **Credenciais protegidas** em arquivo `.env`, fora do GitHub
+
+> ⚠️ A página de cadastro de produto pelo site existe como exercício de formulários e **ainda não exige login**. O cadastro "de verdade" é feito pelo Admin. A proteção chega com a etapa de autenticação.
 
 ---
 
@@ -58,12 +65,21 @@ flowchart LR
 5. **O template** recebe os dados e monta a página em HTML.
 6. **A resposta** volta ao navegador.
 
+### E quando o usuário envia um formulário?
+
+Nas páginas com formulário, a mesma view trata dois momentos:
+
+1. **GET**: o usuário abre a página e recebe o formulário vazio.
+2. **POST**: o usuário envia os dados e a view os entrega ao **Form**, que valida e converte cada campo.
+3. **Dados válidos**: o `ModelForm` grava o produto no banco (`save()`) e a view redireciona para outra página, o que evita reenviar o formulário ao recarregar.
+4. **Dados inválidos**: a página é exibida de novo com as mensagens de erro e o que o usuário já tinha digitado.
+
 ---
 
 ## 🧱 Tecnologias
 
 - **Python**: linguagem do projeto
-- **Django**: framework web (views, templates, ORM, admin)
+- **Django**: framework web (views, templates, ORM, admin, forms)
 - **MySQL 8.4 LTS**: banco de dados
 - **mysqlclient**: driver que conecta o Django ao MySQL
 - **python-dotenv**: leitura das variáveis do arquivo `.env`
@@ -79,6 +95,9 @@ django_project/
 ├── loja/                  # app da loja
 │   ├── models.py          # modelo Produto
 │   ├── views.py           # lógica das páginas
+│   ├── urls.py            # rotas do app
+│   ├── forms.py           # ContatoForm e ProdutoForm (ModelForm)
+│   ├── admin.py           # configuração do painel administrativo
 │   ├── migrations/        # histórico do banco
 │   └── templates/         # páginas HTML
 ├── requirements.txt
@@ -135,14 +154,20 @@ DB_PORT=3306
 
 > ⚠️ Nunca envie o `.env` para o GitHub. Ele já está no `.gitignore`.
 
-**6. Crie as tabelas e inicie o servidor**
+**6. Crie as tabelas e o usuário administrador**
 
 ```bash
 python manage.py migrate
+python manage.py createsuperuser
+```
+
+**7. Inicie o servidor**
+
+```bash
 python manage.py runserver
 ```
 
-Depois, abra `http://127.0.0.1:8000/` no navegador.
+Depois, abra `http://127.0.0.1:8000/` no navegador. O painel administrativo fica em `http://127.0.0.1:8000/admin/`.
 
 ---
 
@@ -153,10 +178,11 @@ Depois, abra `http://127.0.0.1:8000/` no navegador.
 - [x] Models, migrations e ORM
 - [x] Integração com MySQL
 - [x] Variáveis de ambiente (`.env`)
-- [ ] Painel administrativo (Django Admin)
-- [ ] Formulários
+- [x] Painel administrativo (Django Admin)
+- [x] Formulários (`Form` e `ModelForm`)
+- [ ] APIs REST com Django REST Framework 🚧 *(próxima etapa)*
+- [ ] Autenticação e permissões
 - [ ] Carrinho e pedidos
-- [ ] Autenticação de usuários
 - [ ] Views baseadas em classe
 - [ ] Arquivos estáticos e mídia
 - [ ] Testes automatizados
