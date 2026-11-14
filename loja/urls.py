@@ -11,5 +11,6 @@ urlpatterns = [
         path('produtos/<int:id>/', views.detalhe_produto, name='detalhe_produto'),
         path('teste_reverse/', views.teste_reverse, name='teste_reverse'),
         path('', views.home, name='home'), 
-        path('contato/', views.contato, name='contato') 
+        path('contato/', views.contato, name='contato'),
+        path('produtos/novo/', views.novo_produto, name='novo_produto'),
 ]

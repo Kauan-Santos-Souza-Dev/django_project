@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.http import HttpResponse, Http404
 # O . significa “da mesma pasta (app) onde este arquivo está”. É o jeito de a view enxergar o Produto.
 from .models import Produto
+from .forms import ContatoForm, ProdutoForm
 
 # Create your views here.
 # Exectua a lógica de negócios e retorna uma resposta HTTP
@@ -16,7 +17,6 @@ def lista_produtos(request):
     busca = request.GET.get('q', '')
     # O método GET é usado para buscar informações do servidor. Ele é o método padrão quando você acessa uma página web.
     produtos = Produto.objects.filter(nome__icontains=busca) # o que o usuário digitou aparece dentro do nome deste produto?
-    # O método POST é usado para enviar informações para o servidor. Ele é usado quando você envia um formulário, por exemplo.
     return render(request, 'loja/lista.html', {'busca': busca , 'produtos': produtos})
 
 # View 2:
@@ -37,8 +37,23 @@ def home(request):
 
 # View 5: A views 5 permite que o usuário envie uma mensagem de contato.
 def contato(request):
-    metodo = request.method
-    if metodo == 'POST':
-        return HttpResponse(f"Mensagem recebida! Método: {metodo}")
+    if request.method == 'POST':
+        form = ContatoForm(request.POST)
+        if form.is_valid():
+            nome = form.cleaned_data['nome']
+            return HttpResponse(f"Obrigado, {nome}! Mensagem recebida.")
     else:
-        return HttpResponse("Preencha o formulário de contato.")
+        form = ContatoForm()
+    return render(request, 'loja/contato.html', {'form': form})
+
+# View 6: A views 6 permite que o usuário adicione um novo produto.
+def novo_produto(request):
+    if request.method == 'POST':
+        form = ProdutoForm(request.POST)
+        if form.is_valid():
+            produto = form.save()
+            # DEPOIS DE SALVAR O PRODUTO, REDIRECIONA PARA A PÁGINA DE DETALHE DO PRODUTO.
+            return redirect('detalhe_produto', produto.id)
+    else:
+        form = ProdutoForm()
+    return render(request, 'loja/novo_produto.html', {'form': form})

@@ -1,0 +1,11 @@
+{% extends 'loja/base.html' %}
+
+{% block conteudo %}
+<h1>Contato</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enviar</button>
+</form>
+{% endblock %}
