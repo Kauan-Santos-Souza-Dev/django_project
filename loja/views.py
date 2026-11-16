@@ -4,6 +4,9 @@ from django.http import HttpResponse, Http404
 # O . significa “da mesma pasta (app) onde este arquivo está”. É o jeito de a view enxergar o Produto.
 from .models import Produto
 from .forms import ContatoForm, ProdutoForm
+from .serializers import ProdutoSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 # Create your views here.
 # Exectua a lógica de negócios e retorna uma resposta HTTP
@@ -57,3 +60,14 @@ def novo_produto(request):
     else:
         form = ProdutoForm()
     return render(request, 'loja/novo_produto.html', {'form': form})
+
+# View 7: A views 7 permite que o usuário edite um produto existente.
+# Marca a função como view de API e diz que ela só aceita GET. Qualquer outro método recebe 405 Method Not Allowed automaticamente.
+@api_view(['GET'])
+def api_produtos(request):
+    # Busca todos os produtos no banco de dados.
+    produtos = Produto.objects.all()
+    # Entrega essa lista ao serializer. O many=True diz: “são vários produtos”.
+    serializer = ProdutoSerializer(produtos, many=True)
+    # Devolve o resultado em JSON, com status 200 por padrão.
+    return Response(serializer.data)
