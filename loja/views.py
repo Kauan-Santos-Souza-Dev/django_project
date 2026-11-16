@@ -8,6 +8,7 @@ from .serializers import ProdutoSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+
 # Create your views here.
 # Exectua a lógica de negócios e retorna uma resposta HTTP
 
@@ -71,3 +72,13 @@ def api_produtos(request):
     serializer = ProdutoSerializer(produtos, many=True)
     # Devolve o resultado em JSON, com status 200 por padrão.
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def api_produto_detalhe(request, id):
+    # Busca o produto com o id fornecido. Se não existir, levanta 404.
+    produto = get_object_or_404(Produto, id=id)
+    # Devolve o produto em JSON, com status 200 por padrão.
+    serializer = ProdutoSerializer(produto)
+    return Response(serializer.data)
+
