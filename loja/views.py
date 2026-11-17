@@ -7,6 +7,7 @@ from .forms import ContatoForm, ProdutoForm
 from .serializers import ProdutoSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 
 
 # Create your views here.
@@ -63,22 +64,25 @@ def novo_produto(request):
     return render(request, 'loja/novo_produto.html', {'form': form})
 
 # View 7: A views 7 permite que o usuário edite um produto existente.
-# Marca a função como view de API e diz que ela só aceita GET. Qualquer outro método recebe 405 Method Not Allowed automaticamente.
-@api_view(['GET'])
+
+@api_view(['GET', 'POST'])
 def api_produtos(request):
-    # Busca todos os produtos no banco de dados.
-    produtos = Produto.objects.all()
-    # Entrega essa lista ao serializer. O many=True diz: “são vários produtos”.
-    serializer = ProdutoSerializer(produtos, many=True)
-    # Devolve o resultado em JSON, com status 200 por padrão.
-    return Response(serializer.data)
+    # Se o método for GET, retorna todos os produtos.
+    if request.method == 'GET':
+        # Busca todos os produtos no banco de dados.
+        produtos = Produto.objects.all()
+        # Entrega essa lista ao serializer. O many=True diz: “são vários produtos”.
+        serializer = ProdutoSerializer(produtos, many=True)
+        return Response(serializer.data)
 
-
-@api_view(['GET'])
-def api_produto_detalhe(request, id):
-    # Busca o produto com o id fornecido. Se não existir, levanta 404.
-    produto = get_object_or_404(Produto, id=id)
-    # Devolve o produto em JSON, com status 200 por padrão.
-    serializer = ProdutoSerializer(produto)
-    return Response(serializer.data)
+    # se chegou aqui, o método é POST
+    # você entrega dados recebidos para validar e converter em objeto (POST).
+    serializer = ProdutoSerializer(data=request.data)
+    # is_valid() confere os dados contra o model.
+    if serializer.is_valid():
+        # Se os dados forem válidos, salva o objeto no banco de dados.
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
