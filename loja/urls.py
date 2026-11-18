@@ -15,5 +15,5 @@ urlpatterns = [
         path('produtos/novo/', views.novo_produto, name='novo_produto'),
         path('api/produtos/', views.api_produtos, name='api_produtos'),
         # O <int:id> captura o número da URL e o entrega à view no parâmetro id. Se alguém acessar /api/produtos/3/, a view recebe id=3.
-        path('api/produtos/<int:id>/', views.api_produtos, name='api_produto_detalhe'),
+        path('api/produtos/<int:id>/', views.api_produtos_detalhes, name='api_produto_detalhe'),
 ]

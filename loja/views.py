@@ -67,22 +67,44 @@ def novo_produto(request):
 
 @api_view(['GET', 'POST'])
 def api_produtos(request):
+    # GET: devolve todos os produtos.
     # Se o método for GET, retorna todos os produtos.
     if request.method == 'GET':
-        # Busca todos os produtos no banco de dados.
+    # Busca todos os produtos.
         produtos = Produto.objects.all()
-        # Entrega essa lista ao serializer. O many=True diz: “são vários produtos”.
+    # Serializa os produtos e retorna os dados em formato JSON.
         serializer = ProdutoSerializer(produtos, many=True)
         return Response(serializer.data)
 
-    # se chegou aqui, o método é POST
-    # você entrega dados recebidos para validar e converter em objeto (POST).
+    # Se chegou aqui, o método é POST.
+    # Transforma os dados recebidos em um objeto ProdutoSerializer. O data=request.data indica que os dados vêm do corpo da requisição.
     serializer = ProdutoSerializer(data=request.data)
-    # is_valid() confere os dados contra o model.
     if serializer.is_valid():
-        # Se os dados forem válidos, salva o objeto no banco de dados.
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET','PUT','PATCH','DELETE'])
+def api_produtos_detalhes(request, id):
+    # Busca o produto pelo id. Se não existir, levanta uma exceção Http404.
+    produto = get_object_or_404(Produto, id=id)
+    # Se o método for GET, retorna todos os produtos.
+    if request.method == 'GET':
+        # Serializa o produto e retorna os dados em formato JSON.
+        serializer = ProdutoSerializer(produto)
+        # Retorna os dados serializados em formato JSON.
+        return Response(serializer.data)
+    # Se o método for PUT ou PATCH, atualiza o produto.
+    if request.method in ('PUT', 'PATCH'):
+        # guarda True se for PATCH e False se for PUT
+        parcial = request.method == 'PATCH'
+        serializer = ProdutoSerializer(produto, data=request.data, partial=parcial)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # Se chegou aqui, o método é DELETE.
+    else:
+        produto.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
